@@ -1,80 +1,133 @@
 
-# EX 3E Generate Permutations using Backtracking  Approach.
+# EX 3D Sudoku solver - Backtracking.
 
 ## AIM:
-To write a Java program to for given constraints.
-Given an array nums of distinct integers, return all the possible Permutation. You can return the answer in any order.
-Example 1:
-Input: nums = [1,2,3]
-Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+To write a Java program to solve a Sudoku puzzle by filling the empty cells.
+
 For example:
+<img width="357" height="322" alt="image" src="https://github.com/user-attachments/assets/334b8c39-d547-4743-aca0-de92e38bdd1c" />
+
+
+
 ## Algorithm
-1. Input Processing:
-Read the array elements from user input, remove brackets ([]), split by commas, and store them in an integer array nums.
-2. Start Permutation Generation:
-Initialize an empty list ans to store all permutations and call the recursive backtrack() function with an initially empty list curr.
-3. Recursive Backtracking Logic:
-If curr (the current permutation) has the same length as nums, add a copy of curr to ans.
-Otherwise, iterate through each number in nums.
-4.  Build and Explore Permutations:
-For each number not already in curr, add it to curr, recursively call backtrack() to build further, and then remove it (backtrack) to explore other possibilities.
-5.  Output Result:
-After recursion completes, print all generated permutations stored in ans. 
+1. Start the program and read the 9×9 Sudoku board.
+Empty cells are represented by 0.
+2. Define a function isSafe(board, row, col, num) to check if placing num in position (row, col) is valid:
+Check that num does not already exist in the same row.
+Check that num does not already exist in the same column.
+Check that num does not exist in the 3×3 subgrid containing (row, col).
+Return true if all checks pass; otherwise, return false.
+3. Define a recursive function solveSudoku(board, row, col):
+If (row == 8 && col == 9), all cells are filled → return true (solution found).
+If col == 9, move to the next row (row + 1) and set col = 0.
+If the current cell is already filled (non-zero), call solveSudoku for the next column.
+For an empty cell (0):
+Try placing numbers 1 through 9:
+If isSafe() returns true, temporarily place the number.
+Recursively call solveSudoku() for the next cell.
+If recursion succeeds, return true.
+If not, backtrack by resetting the cell to 0.
+If no number can be placed, return false.
+4. In the main() method:
+Input the Sudoku grid from the user.
+Call solveSudoku(board, 0, 0).
+If it returns true, print the solved Sudoku grid using printBoard().
+Otherwise, print “No solution exists.”
+5. End the program.  
 
 ## Program:
 ```
 /*
 Program to implement Reverse a String
 
-import java.util.*;
+import java.util.Scanner;
 
-public class Solution {
+public class SudokuSolver {
 
-    public List<List<Integer>> permute(int[] nums) {
-        List<List<Integer>> ans = new ArrayList<>();
-        backtrack(new ArrayList<>(), ans, nums);
-        return ans;
+    // Check if it's safe to place the number
+    static boolean isSafe(int[][] board, int row, int col, int num) {
+        // Check row and column
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == num || board[i][col] == num)
+                return false;
+        }
+
+        // Check 3x3 subgrid
+        int startRow = row - row % 3;
+        int startCol = col - col % 3;
+
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (board[startRow + i][startCol + j] == num)
+                    return false;
+
+        return true;
     }
 
-    public void backtrack(List<Integer> curr, List<List<Integer>> ans, int[] nums) {
-        if (curr.size() == nums.length) {
-            ans.add(new ArrayList<>(curr));
-            return;
+    // Recursive backtracking solver
+    static boolean solveSudoku(int[][] board, int row, int col) {
+        if(row==8&&col==9)
+            return true;
+        if(col==9){
+            row++;
+            col=0;
         }
-        for (int num : nums) {
-            if (!curr.contains(num)) {
-                curr.add(num);
-                backtrack(curr, ans, nums);
-                curr.remove(curr.size() - 1);
+        if(board[row][col]!=0)
+            return solveSudoku(board,row,col+1);
+        for(int num=1;num<=9;num++){
+            if(isSafe(board,row,col,num)){
+                board[row][col]=num;
+                if(solveSudoku(board,row,col+1))
+                    return true;
+                board[row][col]=0;
             }
+        }
+        return false;
+        //Type your code here
+    }
+
+    // Utility to print the board
+    static void printBoard(int[][] board) {
+        for (int[] row : board) {
+            for (int val : row)
+                System.out.print(val + " ");
+            System.out.println();
         }
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        String inputLine = scanner.nextLine().trim();
+        Scanner sc = new Scanner(System.in);
+        int[][] board = new int[9][9];
 
-        // ✅ Correct way to remove brackets
-        inputLine = inputLine.replaceAll("\\[|\\]", "");
-        String[] parts = inputLine.split(",");
+      //  System.out.println("Enter the Sudoku puzzle row by row (use 0 for empty cells):");
 
-        int[] nums = new int[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-            nums[i] = Integer.parseInt(parts[i].trim());
+        for (int i = 0; i < 9; i++) {
+            //System.out.print("Enter row " + (i + 1) + ": ");
+            for (int j = 0; j < 9; j++) {
+                board[i][j] = sc.nextInt();
+            }
         }
 
-        Solution solution = new Solution();
-        List<List<Integer>> permutations = solution.permute(nums);
-        System.out.println(permutations);
-        scanner.close();
+      //  System.out.println("\nSolving...\n");
+
+        if (solveSudoku(board, 0, 0)) {
+            System.out.println("Solved Sudoku:");
+            printBoard(board);
+        } else {
+            System.out.println("No solution exists.");
+        }
+
+        sc.close();
     }
 }
- 
+
 */
 ```
 
 ## Output:
-<img width="1246" height="239" alt="image" src="https://github.com/user-attachments/assets/45b05d0f-2a94-4edc-9b76-4492737efec6" />
+<img width="670" height="621" alt="image" src="https://github.com/user-attachments/assets/c914410d-005a-40e6-ae09-ad5897cb6202" />
+
+
 
 ## Result:
 The program successfully implemented and the expected output is verified.
